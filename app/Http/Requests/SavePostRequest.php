@@ -26,6 +26,19 @@ class SavePostRequest extends FormRequest
         return [
             'title' => ['required', 'string', 'min:4'],
             'body' => ['required', 'string', 'min:4'],
-        ];
-    }
+            ];
+        }
+            
+    /**
+     * Here you can customize the error messages for validation failures.
+    */
+
+    /** public function messages()
+     * {
+     *    return [
+     *        'title.required' => 'ALERT! The title field is required.',
+     *        'body.required' => 'The body field is required.',
+     *      ];
+     *    }
+    */
 }

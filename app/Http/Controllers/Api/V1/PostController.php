@@ -16,7 +16,12 @@ class PostController extends Controller
      */
     public function index()
     {
-        return PostResource::collection(Post::all());
+        return PostResource::collection(Post::paginate());
+
+        /**
+         * Use this if you want to include the user relationship in the response. Make sure to eager load the user relationship in the Post model.
+         */
+        // return PostResource::collection(Post::with('user')->get());
     }
 
     /**
@@ -29,7 +34,7 @@ class PostController extends Controller
 
         $post = Post::create($data);
 
-        return response()->json([new PostResource($post)], 201);
+        return new PostResource($post);
     }
 
     /**
@@ -37,7 +42,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return response()->json([new PostResource($post)], 200);
+        return new PostResource($post);
     }
 
     /**
@@ -51,10 +56,7 @@ class PostController extends Controller
 
         $post->update($data);
 
-        return response()->json([
-            'message' => 'Post updated successfully',
-            'data' => new PostResource($post),
-        ], 201);
+        return new PostResource($post);
     }
 
     /**
