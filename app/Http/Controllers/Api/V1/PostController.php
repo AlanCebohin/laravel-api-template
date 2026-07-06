@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SavePostRequest;
+use App\Http\Resources\PostResource;
 
 class PostController extends Controller
 {
@@ -15,12 +16,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::all();
-        
-        return response()->json([
-            'message' => 'List of posts',
-            'data' => $posts,
-        ]);
+        return PostResource::collection(Post::all());
     }
 
     /**
@@ -33,10 +29,7 @@ class PostController extends Controller
 
         $post = Post::create($data);
 
-        return response()->json([
-            'message' => 'Post created successfully',
-            'data' => $post,
-        ], 201);
+        return response()->json([new PostResource($post)], 201);
     }
 
     /**
@@ -44,7 +37,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return response()->json([$post]);
+        return response()->json([new PostResource($post)], 200);
     }
 
     /**
@@ -60,7 +53,7 @@ class PostController extends Controller
 
         return response()->json([
             'message' => 'Post updated successfully',
-            'data' => $post,
+            'data' => new PostResource($post),
         ], 201);
     }
 
