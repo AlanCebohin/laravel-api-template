@@ -4,12 +4,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PostController;
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-Route::group(['prefix' => 'v1'], function () {
-    Route::apiResource('posts', PostController::class);
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::group(['prefix' => 'v1'], function () {
+        Route::apiResource('posts', PostController::class);
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -8,25 +8,22 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SavePostRequest;
 use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Auth;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        return PostResource::collection(Post::paginate());
+        $user = request()->user();
+        $posts = $user->posts()->paginate();
+        return PostResource::collection($posts);
 
         /**
          * Use this if you want to include the user relationship in the response. Make sure to eager load the user relationship in the Post model.
          */
-        // return PostResource::collection(Post::with('user')->get());
+        // $posts = $user->posts()->with('user')->paginate();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(SavePostRequest $request)
     {
         $data = $request->validated();
@@ -37,19 +34,20 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Post $post)
     {
+        $user = request()->user();
+
+        abort_if(Auth::id() !== $post->user_id, 404, 'Address not found.');
+        // abort(403, 'Access Forbidden.'); // Even though correct, avoid using 403 to prevent information disclosure about the existence of the resource
+        
         return new PostResource($post);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(SavePostRequest $request, Post $post)
     {
+        abort_if(Auth::id() !== $post->user_id, 404, 'Address not found.');
+        
         $data = $request->validated();
 
         $data['user_id'] = User::first()->id;
@@ -59,11 +57,10 @@ class PostController extends Controller
         return new PostResource($post);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Post $post)
     {
+        abort_if(Auth::id() !== $post->user_id, 404, 'Address not found.');
+
         $post->delete();
 
         return response()->noContent();
